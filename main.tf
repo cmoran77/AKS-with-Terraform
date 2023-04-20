@@ -26,27 +26,6 @@ resource "azurerm_resource_group" "rg" {
   }
 }
 
-# Create a virtual network
-resource "azurerm_virtual_network" "vnet" {
-  name                = var.network_name
-  address_space       = ["10.0.0.0/16"]
-  location            = var.resource_group_location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  tags = {
-    Environment = var.tag_environment
-    Team = var.tag_team
-  }
-}
-
-# Create a subnet
-resource "azurerm_subnet" "test" {
-   name                 = "subnetTF"
-   resource_group_name  = azurerm_resource_group.rg.name
-   virtual_network_name = azurerm_virtual_network.vnet.name
-   address_prefixes     = ["10.0.1.0/24"]
- }
-
 # Create the AKS cluster
 resource "azurerm_kubernetes_cluster" "aks" {
   location            = azurerm_resource_group.rg.location
@@ -68,12 +47,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
   identity {
     type = "SystemAssigned"
   }
-  /*
+
   network_profile {
     network_plugin    = "kubenet"
     load_balancer_sku = "standard"
   }
 
+
+  /*
   service_principal {
     client_id     = var.aks_service_principal_app_id
     client_secret = var.aks_service_principal_client_secret
